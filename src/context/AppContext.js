@@ -12,6 +12,7 @@ export const AppReducer = (state, action) => {
                 },0
             );
             total_budget = total_budget + action.payload.cost;
+            console.log("action.payload.cost: "+action.payload.cost);
             action.type = "DONE";
             if(total_budget <= state.budget) {
                 total_budget = 0;
@@ -25,7 +26,9 @@ export const AppReducer = (state, action) => {
                     ...state,
                 };
             } else {
-                alert("Cannot increase the allocation! Out of funds");
+                let remaining_founds = total_budget - state.budget;
+                let curCurrency = state.currency;
+                alert("The value cannot exceed remaining founds "+curCurrency+remaining_founds);
                 return {
                     ...state
                 }
@@ -46,7 +49,7 @@ export const AppReducer = (state, action) => {
             case 'DELETE_EXPENSE':
             action.type = "DONE";
             state.expenses.map((currentExp)=> {
-                if (currentExp.name === action.payload) {
+                if (currentExp.name === action.payload.name) {
                     budget = state.budget + currentExp.cost
                     currentExp.cost =  0;
                 }
@@ -59,7 +62,18 @@ export const AppReducer = (state, action) => {
             };
         case 'SET_BUDGET':
             action.type = "DONE";
-            state.budget = action.payload;
+            let new_budget_value = action.payload;
+
+            let total_expenses = 0
+            state.expenses.map((currentExp)=> {
+                total_expenses=total_expenses+currentExp.cost;
+            });
+            console.log(total_expenses);
+            if (new_budget_value < total_expenses) {
+                alert("You cannot reduce the budget value lower than the spanding.");
+            } else {
+                state.budget = new_budget_value;
+            }
 
             return {
                 ...state,
